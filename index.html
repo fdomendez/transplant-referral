@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Referencia a Unidad de Trasplante Cardíaco — Herramienta</title>
+<style>
+  :root{
+    --bg: #f7f8fa;
+    --card:#ffffff;
+    --text:#111827;
+    --muted:#6b7280;
+    --primary:#2563eb;
+    --ok:#16a34a;
+    --bad:#ef4444;
+    --border:#e5e7eb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  .container{max-width:1100px;margin:0 auto;padding:24px;}
+  h1{font-size:clamp(20px,3vw,28px);margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .grid{display:grid;gap:16px}
+  @media(min-width:1000px){.grid{grid-template-columns:2fr 1fr}}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .card h2{font-size:18px;margin:0 0 4px}
+  .hint{color:var(--muted);font-size:12px;margin-top:2px}
+  .row{display:grid;gap:12px}
+  @media(min-width:720px){.row{grid-template-columns:1fr 1fr}}
+  label{font-weight:600;font-size:14px;display:block;margin-bottom:6px}
+  input[type=number], select{width:100%;padding:10px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:14px}
+  .toggle{display:flex;justify-content:space-between;align-items:flex-start;border:1px solid var(--border);border-radius:12px;padding:10px;gap:10px}
+  .toggle .lbl{font-weight:600}
+  .tog{transform:scale(1.1)}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px}
+  .badge.ok{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
+  .badge.no{background:#fef2f2;border-color:#fecaca;color:#7f1d1d;opacity:.85}
+  .result{display:flex;align-items:center;gap:10px}
+  .result .status{font-size:18px;font-weight:700}
+  .result .dot{width:14px;height:14px;border-radius:50%}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  button{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:600}
+  button.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+  .note{font-size:12px;color:var(--muted);margin-top:8px}
+  .mini{font-size:12px;color:var(--muted)}
+  .slider-wrap{display:flex;align-items:center;gap:10px}
+  input[type=range]{width:100%}
+  .footer{margin-top:12px;text-align:center}
+  .hr{height:1px;background:var(--border);margin:10px 0}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+      <div>
+        <h1>Criterios de referencia a Unidad de Trasplante Cardíaco</h1>
+        <div class="sub">Herramienta educativa de apoyo a la decisión. No sustituye el juicio clínico.</div>
+      </div>
+      <div class="btns">
+        <button onclick="resetAll()">Reiniciar</button>
+        <button class="primary" onclick="window.print()">Guardar / Imprimir</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="left column">
+        <div class="card">
+          <h2>Datos clínicos generales</h2>
+          <div class="row">
+            <div>
+              <label for="age">Edad (años)</label>
+              <input id="age" type="number" min="0" placeholder="Ej. 54" oninput="recompute()" />
+            </div>
+            <div>
+              <label for="nyha">Clase funcional NYHA</label>
+              <select id="nyha" onchange="recompute()">
+                <option value="">Selecciona</option>
+                <option>I</option><option>II</option><option>III</option><option>IV</option>
+              </select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="toggle">
+              <div><div class="lbl">En terapia médica óptima (HFrEF)</div><div class="hint">IECA/ARNI + Betabloqueante + Antialdosterónico + ISGLT-2</div></div>
+              <input id="opt" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+            <div class="toggle">
+              <div><div class="lbl">Péptidos natriuréticos persistentemente elevados</div></div>
+              <input id="np" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="toggle" style="grid-column:1/-1">
+              <div><div class="lbl">Intolerancia hemodinámica al tratamiento</div><div class="hint">Hipotensión (PAS &lt; 90 mmHg) o incapacidad de titular/retirar fármacos</div></div>
+              <input id="hemo" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Progresión de la enfermedad <span class="mini">(alguna de las siguientes)</span></h2>
+          <div class="row">
+            <div class="toggle">
+              <div><div class="lbl">Congestión persistente</div><div class="hint">Aumento de diurético, terapia EV o &gt;1 ingreso/ER por IC en 6 meses</div></div>
+              <input id="prog_cong" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+            <div class="toggle">
+              <div><div class="lbl">Necesidad de inotrópicos endovenosos</div></div>
+              <input id="prog_ino" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="toggle" style="grid-column:1/-1">
+              <div><div class="lbl">Arritmias ventriculares complejas</div></div>
+              <input id="prog_arr" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Hallazgos ecocardiográficos <span class="mini">(al menos uno)</span></h2>
+          <div class="row">
+            <div>
+              <label for="lvef">Fracción de eyección (FEVI)</label>
+              <div class="slider-wrap">
+                <input id="lvef" type="range" min="5" max="80" step="1" value="50" oninput="syncLVEF(this.value)" />
+                <div><span id="lvef_val">50</span>%</div>
+              </div>
+            </div>
+            <div class="toggle">
+              <div><div class="lbl">Fallo de ventrículo derecho aislado</div></div>
+              <input id="rv" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="toggle">
+              <div><div class="lbl">Valvulopatía severa no operable</div></div>
+              <input id="valv" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+            <div class="toggle">
+              <div><div class="lbl">Miocardiopatía restrictiva</div></div>
+              <input id="restrict" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Criterios de exclusión <span class="mini">(todos deben estar ausentes)</span></h2>
+          <div class="row">
+            <div class="toggle">
+              <div><div class="lbl">Hepatopatía crónica avanzada (Child C)</div></div>
+              <input id="ex_liver" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+            <div class="toggle">
+              <div><div class="lbl">Insuficiencia renal estadio IV–V</div></div>
+              <input id="ex_renal" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="toggle">
+              <div><div class="lbl">Enfermedad neoplásica activa</div></div>
+              <input id="ex_neopl" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+            <div class="toggle">
+              <div><div class="lbl">Neumopatía avanzada (EPOC severo)</div></div>
+              <input id="ex_lung" type="checkbox" class="tog" onchange="recompute()" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right column">
+        <div class="card">
+          <h2>Resultado</h2>
+          <div class="result">
+            <div id="dot" class="dot" style="background:#d1d5db"></div>
+            <div>
+              <div id="status" class="status">Completa los campos…</div>
+              <div class="mini">Basado en los criterios del documento proporcionado.</div>
+            </div>
+          </div>
+          <div class="badges" id="badges"></div>
+        </div>
+
+        <div class="card">
+          <h2>Resumen para nota clínica</h2>
+          <div id="summary" class="mini">Se generará un resumen conforme complete los campos.</div>
+          <div class="hr"></div>
+          <div class="mini">Puede copiar y pegar este resumen a la historia clínica y adjuntarlo al formulario de referencia.</div>
+        </div>
+
+        <div class="card">
+          <h2>Parámetros y lógica (transparencia)</h2>
+          <ul class="mini">
+            <li>Edad &lt; 60 años.</li>
+            <li>Síntomas NYHA III–IV <em>con</em> terapia médica óptima (IECA/ARNI + BB + MRA + ISGLT‑2) <strong>o</strong> péptidos natriuréticos persistentemente elevados.</li>
+            <li>Además, intolerancia hemodinámica al tratamiento <strong>o</strong> progresión de la enfermedad (congestión persistente, necesidad de inotrópicos EV o arritmias ventriculares complejas).</li>
+            <li>Y al menos una alteración en ecocardiograma: FEVI &lt; 30%, fallo VD aislado, valvulopatía severa no operable, miocardiopatía restrictiva.</li>
+            <li>Con ausencia de: hepatopatía avanzada (Child C), ERC IV–V, neoplasia activa, neumopatía avanzada.</li>
+          </ul>
+        </div>
+
+        <div class="footer mini">© 2025 — Herramienta educativa</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+function val(id){ const el=document.getElementById(id); return el ? (el.type==='checkbox'? el.checked : el.value) : null; }
+function nyhaNum(v){ return v==='I'?1:v==='II'?2:v==='III'?3:v==='IV'?4:null; }
+function pill(ok, text){ return '<span class=\"badge '+(ok?'ok':'no')+'\">'+(ok?'✔':'✖')+' '+text+'</span>'; }
+
+function syncLVEF(v){
+  document.getElementById('lvef_val').innerText = v;
+  recompute();
+}
+
+function recompute(){
+  const age = parseInt(val('age')||'NaN',10);
+  const ageOk = !Number.isNaN(age) && age < 60;
+  const ny = val('nyha');
+  const nyNum = nyhaNum(ny);
+  const symptomsSevere = nyNum!==null && nyNum>=3;
+  const onOpt = !!val('opt');
+  const npHigh = !!val('np');
+  const hemo = !!val('hemo');
+
+  const therapyOrNP = (symptomsSevere && onOpt) || npHigh;
+
+  const prog_cong = !!val('prog_cong');
+  const prog_ino = !!val('prog_ino');
+  const prog_arr = !!val('prog_arr');
+  const progressionAny = prog_cong || prog_ino || prog_arr;
+
+  const lvef = parseInt(document.getElementById('lvef_val').innerText,10);
+  const rv = !!val('rv');
+  const valv = !!val('valv');
+  const restrict = !!val('restrict');
+  const echoAny = (lvef < 30) || rv || valv || restrict;
+
+  const ex_liver = !!val('ex_liver');
+  const ex_renal = !!val('ex_renal');
+  const ex_neopl = !!val('ex_neopl');
+  const ex_lung = !!val('ex_lung');
+  const exclusionsNone = !(ex_liver || ex_renal || ex_neopl || ex_lung);
+
+  const meetsReferral = Boolean(ageOk && therapyOrNP && (hemo || progressionAny) && echoAny && exclusionsNone);
+
+  // Update status
+  const statusEl = document.getElementById('status');
+  const dotEl = document.getElementById('dot');
+  statusEl.textContent = meetsReferral ? 'Cumple criterios de referencia' : 'No cumple criterios completos de referencia';
+  dotEl.style.background = meetsReferral ? '#16a34a' : '#ef4444';
+
+  // Pills
+  const badges = [
+    pill(ageOk, 'Edad < 60'),
+    pill(therapyOrNP, 'Síntomas (NYHA III–IV) con TMO o PN altos'),
+    pill(hemo || progressionAny, 'Intolerancia hemodinámica o progresión'),
+    pill(echoAny, 'Alteración ecocardiográfica'),
+    pill(exclusionsNone, 'Sin criterios de exclusión'),
+  ];
+  document.getElementById('badges').innerHTML = badges.join('');
+
+  // Summary text
+  const sum = [
+    `<strong>Edad:</strong> ${Number.isNaN(age)?'—':age} años`,
+    `<strong>NYHA:</strong> ${ny||'—'} ${onOpt?'(en TMO)':''}`,
+    `<strong>Péptidos natriuréticos:</strong> ${npHigh?'elevados':'no documentado'}`,
+    `<strong>Intolerancia hemodinámica:</strong> ${hemo?'sí':'no'}`,
+    `<strong>Progresión:</strong> ${(progressionAny)?'sí':'no'}`,
+    `<strong>Eco:</strong> FEVI ${lvef??'—'}%${rv?', fallo VD aislado':''}${valv?', valvulopatía severa no operable':''}${restrict?', miocardiopatía restrictiva':''}`,
+    `<strong>Exclusiones:</strong> ${exclusionsNone?'ninguna':'presente(s)'}`,
+  ].join('<br>');
+  document.getElementById('summary').innerHTML = sum;
+}
+
+function resetAll(){
+  ['age','nyha','opt','np','hemo','prog_cong','prog_ino','prog_arr','rv','valv','restrict','ex_liver','ex_renal','ex_neopl','ex_lung'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.type==='checkbox'){ el.checked = false; }
+    else { el.value = ''; }
+  });
+  document.getElementById('lvef').value = 50;
+  document.getElementById('lvef_val').innerText = 50;
+  recompute();
+}
+recompute();
+</script>
+</body>
+</html>
